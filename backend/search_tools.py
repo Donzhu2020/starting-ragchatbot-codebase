@@ -113,6 +113,89 @@ class CourseSearchTool(Tool):
         
         return "\n\n".join(formatted)
 
+class CourseOutlineTool(Tool):
+    """Tool for getting course outlines with course title, link, and complete lesson list"""
+    
+    def __init__(self, vector_store: VectorStore):
+        self.store = vector_store
+    
+    def get_tool_definition(self) -> Dict[str, Any]:
+        """Return Anthropic tool definition for this tool"""
+        return {
+            "name": "get_course_outline",
+            "description": "Get course outline including title, link, and complete lesson list",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "course_name": {
+                        "type": "string",
+                        "description": "Course title (partial matches work, e.g. 'MCP', 'Introduction')"
+                    }
+                },
+                "required": ["course_name"]
+            }
+        }
+    
+    def execute(self, course_name: str) -> str:
+        """
+        Execute the course outline tool with given course name.
+        
+        Args:
+            course_name: Course name to search for
+            
+        Returns:
+            Formatted course outline or error message
+        """
+        # Resolve course name using semantic search
+        course_title = self.store._resolve_course_name(course_name)
+        if not course_title:
+            return f"No course found matching '{course_name}'"
+        
+        # Get course metadata from the course catalog
+        try:
+            results = self.store.course_catalog.get(ids=[course_title])
+            if not results or not results['metadatas'] or not results['metadatas'][0]:
+                return f"No metadata found for course '{course_title}'"
+            
+            metadata = results['metadatas'][0]
+            return self._format_course_outline(metadata)
+            
+        except Exception as e:
+            return f"Error retrieving course outline: {str(e)}"
+    
+    def _format_course_outline(self, metadata: Dict[str, Any]) -> str:
+        """Format course metadata into a readable outline"""
+        import json
+        
+        # Extract basic course info
+        title = metadata.get('title', 'Unknown Course')
+        course_link = metadata.get('course_link', 'No link available')
+        instructor = metadata.get('instructor', 'Unknown Instructor')
+        
+        # Build formatted response
+        outline = [f"**{title}**"]
+        outline.append(f"Course Link: {course_link}")
+        outline.append(f"Instructor: {instructor}")
+        outline.append("")
+        outline.append("**Lessons:**")
+        
+        # Parse and format lessons
+        lessons_json = metadata.get('lessons_json')
+        if lessons_json:
+            try:
+                lessons = json.loads(lessons_json)
+                for lesson in lessons:
+                    lesson_num = lesson.get('lesson_number', 'N/A')
+                    lesson_title = lesson.get('lesson_title', 'Untitled')
+                    outline.append(f"Lesson {lesson_num}: {lesson_title}")
+            except json.JSONDecodeError:
+                outline.append("Error parsing lesson information")
+        else:
+            outline.append("No lesson information available")
+        
+        return "\n".join(outline)
+
+
 class ToolManager:
     """Manages available tools for the AI"""
     

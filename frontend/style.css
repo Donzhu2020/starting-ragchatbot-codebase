@@ -206,6 +206,23 @@ header h1 {
     border-bottom-left-radius: 4px;
 }
 
+/* Link styling for better visibility on dark background */
+.message-content a {
+    color: #60a5fa; /* Light blue for better visibility */
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.message-content a:hover {
+    color: #93c5fd; /* Lighter blue on hover */
+    text-decoration: underline;
+}
+
+.message-content a:visited {
+    color: #a78bfa; /* Light purple for visited links */
+}
+
 /* Message metadata */
 .message-meta {
     font-size: 0.75rem;
@@ -599,6 +616,31 @@ details[open] .suggested-header::before {
     color: var(--text-secondary);
     font-style: italic;
     text-transform: none;
+}
+
+/* New Chat Button - styled like other sidebar headers */
+.new-chat-button {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem 0;
+    border: none;
+    background: none;
+    outline: none;
+    transition: color 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+    width: auto;
+}
+
+.new-chat-button:focus {
+    color: var(--primary-color);
+}
+
+.new-chat-button:hover {
+    color: var(--primary-color);
 }
 
 /* Suggested Questions in Sidebar */
