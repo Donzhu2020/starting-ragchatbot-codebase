@@ -28,6 +28,30 @@ cp .env.example .env
 - **API Documentation**: Available at http://localhost:8000/docs
 - **Course Documents**: Place in `docs/` directory for automatic loading
 
+### Code Quality Tools
+```bash
+# Install development dependencies (includes Black, isort, flake8)
+uv sync --group dev
+
+# Run complete quality checks
+./scripts/quality-check.sh
+
+# Auto-fix formatting issues
+./scripts/format-fix.sh
+
+# Check formatting only (without fixing)
+./scripts/format.sh
+
+# Run linting only
+./scripts/lint.sh
+```
+
+**Quality Standards:**
+- **Black**: Code formatting with 88 character line length
+- **isort**: Import sorting compatible with Black
+- **flake8**: Code linting and style checking
+- All Python files are automatically formatted for consistency
+
 ## System Architecture
 
 This is a Retrieval-Augmented Generation (RAG) chatbot system with the following key architectural patterns:
